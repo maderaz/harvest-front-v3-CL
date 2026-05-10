@@ -325,11 +325,17 @@ const CLVault = () => {
     return `Routed via CLWrapper(${VAULT.pair.token1}): receive ${VAULT.pair.token1} only`
   }, [output])
 
+  // Maximize-at-optimal-ratio. Given the user's wallet balances, picks the largest deposit
+  // pair that respects VAULT.optimalRatio without exceeding either balance. Uses up the
+  // smaller side fully and leaves the difference on the larger side.
   const balance = () => {
-    const total = parseFloat(dep0) || parseFloat(dep1) || 0
-    if (!total) return
-    setDep0((total * VAULT.optimalRatio.token0).toFixed(4))
-    setDep1((total * VAULT.optimalRatio.token1).toFixed(4))
+    const b0 = parseFloat(VAULT.walletBalances.token0)
+    const b1 = parseFloat(VAULT.walletBalances.token1)
+    const r0 = VAULT.optimalRatio.token0
+    const r1 = VAULT.optimalRatio.token1
+    const max = Math.min(b0 / r0, b1 / r1)
+    setDep0((max * r0).toFixed(4))
+    setDep1((max * r1).toFixed(4))
   }
 
   const supplyDisabled =
@@ -378,7 +384,8 @@ const CLVault = () => {
       $backcolor={bgColorBox}
       $bordercolor={borderColorBox}
       $marginbottom="0"
-      $height="120px"
+      $height="auto"
+      style={{ minHeight: 130 }}
     >
       <NewLabel
         $display="flex"
@@ -443,7 +450,7 @@ const CLVault = () => {
           </NewLabel>
         </FlexDiv>
       </FlexDiv>
-      <ChartFrame $bg={bgColorChart}>
+      <ChartFrame $bg={bgColorBox}>
         <AxisYLeft $muted={fontColor3}>
           <span>$1.08</span>
           <span>$0.88</span>
@@ -479,7 +486,7 @@ const CLVault = () => {
           }}
         >
           <polyline
-            points="0,82 12,80 24,76 36,72 48,70 60,64 72,60 84,55 96,52 108,46 120,42 132,38 144,32 156,30 168,26 180,22 192,20 200,18"
+            points="0,82 8,78 16,84 24,72 32,76 40,66 48,72 56,58 64,64 72,52 80,60 88,46 96,54 104,42 112,48 120,36 128,44 136,30 144,38 152,26 160,32 168,20 176,28 184,18 192,24 200,14"
             fill="none"
             stroke="#5dcf46"
             strokeWidth="1.4"
@@ -487,7 +494,7 @@ const CLVault = () => {
             strokeLinecap="round"
           />
           <polyline
-            points="0,86 12,85 24,82 36,80 48,77 60,74 72,70 84,66 96,62 108,57 120,52 132,48 144,42 156,38 168,32 180,28 192,24 200,22"
+            points="0,86 8,84 16,90 24,82 32,86 40,76 48,80 56,72 64,76 72,68 80,72 88,60 96,66 104,56 112,62 120,50 128,56 136,42 144,48 152,38 160,44 160,32 176,38 184,30 192,36 200,26"
             fill="none"
             stroke="#7d68d3"
             strokeWidth="1.4"
@@ -591,10 +598,8 @@ const CLVault = () => {
               </MainTagPanel>
               <NetDetail>
                 <NetDetailItem>
-                  <NetDetailTitle $fontcolor={fontColor}>Strategy:</NetDetailTitle>
                   <NetDetailContent $fontcolor={fontColor}>
-                    Concentrated Liquidity • {VAULT.protocol} • {VAULT.pair.token0}/
-                    {VAULT.pair.token1} {VAULT.feeTier}
+                    Concentrated Liquidity - {VAULT.protocol} | T-1
                   </NetDetailContent>
                 </NetDetailItem>
                 <NetDetailItem>
@@ -956,23 +961,21 @@ const CLVault = () => {
                             </TokenPill>
                           </FieldBox>
 
-                          {parseFloat(dep0) > 0 && parseFloat(dep1) > 0 && (
-                            <Hint
-                              $muted={fontColor3}
-                              $border={borderColorBox}
-                              $fc={fontColor1}
-                              $hover={hoverColorNew}
-                            >
-                              <span>
-                                Optimal ratio at current price:{' '}
-                                {Math.round(VAULT.optimalRatio.token0 * 100)}/
-                                {Math.round(VAULT.optimalRatio.token1 * 100)}
-                              </span>
-                              <button type="button" onClick={balance}>
-                                Balance
-                              </button>
-                            </Hint>
-                          )}
+                          <Hint
+                            $muted={fontColor3}
+                            $border={borderColorBox}
+                            $fc={fontColor1}
+                            $hover={hoverColorNew}
+                          >
+                            <span>
+                              Optimal ratio at current price:{' '}
+                              {Math.round(VAULT.optimalRatio.token0 * 100)}/
+                              {Math.round(VAULT.optimalRatio.token1 * 100)}
+                            </span>
+                            <button type="button" onClick={balance}>
+                              Balance
+                            </button>
+                          </Hint>
 
                           {depRoute && (
                             <>
@@ -1290,7 +1293,7 @@ const CLVault = () => {
                         </NewLabel>
                       </FlexDiv>
                     </FlexDiv>
-                    <ChartFrame $bg={bgColorChart}>
+                    <ChartFrame $bg={bgColorBox}>
                       <AxisYLeft $muted={fontColor3}>
                         <span>1.012</span>
                         <span>1.008</span>
@@ -1318,7 +1321,7 @@ const CLVault = () => {
                         }}
                       >
                         <polyline
-                          points="0,90 8,89 16,88 24,86 32,85 40,83 48,82 56,80 64,78 72,76 80,73 88,71 96,68 104,66 112,63 120,60 128,57 136,53 144,50 152,46 160,42 168,38 176,34 184,30 192,26 200,22"
+                          points="0,90 8,84 16,88 24,76 32,82 40,72 48,78 56,66 64,72 72,60 80,68 88,54 96,62 104,50 112,58 120,46 128,52 136,40 144,46 152,36 160,42 168,30 176,36 184,28 192,32 200,22"
                           fill="none"
                           stroke="#5dcf46"
                           strokeWidth="1.5"
