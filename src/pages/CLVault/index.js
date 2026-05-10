@@ -67,9 +67,9 @@ import TickCross from '../../assets/images/logos/tick-cross.svg'
  * Tab content shape (matching classic page):
  *   activeMainTag === 0 (Manage):  InternalSection > full-width
  *                                  ManageBoxWrapper (3 stats panels) +
- *                                  MainSection (Active Range + Composition +
- *                                  USD/Underlying chart) + RestContent
- *                                  (Supply/Revert form).
+ *                                  MainSection (USD/Underlying chart first,
+ *                                  then Active Range + Composition) +
+ *                                  RestContent (Supply/Revert form).
  *   activeMainTag === 1 (Details): InternalSection > full-width BoxCover
  *                                  (4 ValueBox) + MainSection (chart +
  *                                  mechanics + Source of Yield) + RestContent
@@ -413,7 +413,7 @@ const CLVault = () => {
   const balanceChart = (
     <HalfInfo
       $padding="20px"
-      $marginbottom="0"
+      $marginbottom="20px"
       $backcolor={bgColorBox}
       $bordercolor={borderColorBox}
     >
@@ -594,7 +594,10 @@ const CLVault = () => {
               </ManageBoxWrapper>
 
               <MainSection $height="100%">
-                {/* Active Range — CL-specific card, classic chrome */}
+                {/* Performance chart — placed first per design (USD/Underlying balance) */}
+                    {balanceChart}
+
+                    {/* Active Range — CL-specific card, classic chrome */}
                     <HalfInfo
                       $backcolor={bgColorBox}
                       $bordercolor={borderColorBox}
@@ -664,8 +667,6 @@ const CLVault = () => {
                       )}
                       <div style={{ height: 8 }} />
                     </HalfInfo>
-
-                    {balanceChart}
                   </MainSection>
 
                   <RestContent>
