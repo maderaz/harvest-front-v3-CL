@@ -31,10 +31,12 @@ export const Badge = styled.span`
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
+  padding: 4px 10px 4px 8px;
   border-radius: 999px;
   font-size: 12px;
   font-weight: 700;
+  flex-shrink: 0;
+  white-space: nowrap;
   background: ${p => (p.$ok ? '#e7f8ec' : '#fdecec')};
   color: ${p => (p.$ok ? '#137a3a' : '#a8201f')};
 
@@ -157,15 +159,23 @@ export const Caret = styled.span`
 export const FieldLabel = styled.label`
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 12px;
   font-size: 12px;
   font-weight: 600;
   color: ${p => p.$muted};
   margin-bottom: 6px;
 
+  span:first-child {
+    min-width: 0;
+  }
+
   span.bal {
     color: ${p => p.$fc};
     font-weight: 600;
     cursor: pointer;
+    flex-shrink: 0;
+    white-space: nowrap;
     transition: opacity 0.15s;
   }
   span.bal:hover {
@@ -321,6 +331,8 @@ export const Slippage = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
   font-size: 12px;
   color: ${p => p.$muted};
   margin-bottom: 12px;
@@ -356,6 +368,11 @@ export const ChartFrame = styled.div`
   overflow: hidden;
   padding: 14px 8px;
   box-sizing: border-box;
+
+  @media screen and (max-width: 992px) {
+    height: 240px;
+    padding: 10px 4px;
+  }
 `
 
 export const AxisYLeft = styled.div`
@@ -420,5 +437,34 @@ export const RangeBtn = styled.button`
 
   &:hover {
     color: ${p => p.$fc};
+  }
+`
+
+/* Local replacement for ManageBoxWrapper. Same row layout on desktop, but
+   keeps a vertical gap when the 3 panels stack on mobile (the inherited
+   wrapper sets gap: 0px below 992px which makes panels visually merge). */
+export const ManagePanelsRow = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  gap: 25px;
+  margin-bottom: 25px;
+
+  @media screen and (max-width: 992px) {
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+`
+
+/* Headline tweaks for the CL-page TopDesc. The classic TopDesc has
+   line-height 82px which makes sense for desktop where the icons are 60px
+   tall, but on mobile that produces a giant blank line. Override here. */
+export const TopDescOverride = styled.div`
+  & > * {
+    @media screen and (max-width: 992px) {
+      font-size: 18px;
+      line-height: 26px;
+    }
   }
 `
