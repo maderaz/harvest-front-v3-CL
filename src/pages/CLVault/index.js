@@ -178,6 +178,8 @@ const VAULT = {
     token1Amount: '8.91',
   },
   userSlice: { shares: '0.00', token0: '0.00', token1: '0.00' },
+  // Mock wallet balances for the deposit form (click "Balance: X" to MAX into the input).
+  walletBalances: { token0: '1.4382', token1: '12.7615' },
   params: {
     targetWidth: '14.0%',
     currentWidth: '13.5%',
@@ -395,14 +397,21 @@ const CLVault = () => {
           <Question id={tooltipId} dark={darkMode} content={tooltipContent} />
         </FlexDiv>
       </NewLabel>
-      {rows.map(([label, value], i) => (
-        <FlexDiv key={i} $justifycontent="space-between" $padding="8px 15px">
+      {rows.map(([label, value, token], i) => (
+        <FlexDiv key={i} $justifycontent="space-between" $padding="8px 15px" style={{ alignItems: 'flex-start' }}>
           <NewLabel $size="12px" $weight="500" $height="20px" $fontcolor={fontColor3}>
             {label}
           </NewLabel>
-          <NewLabel $size="14px" $weight="600" $height="20px" $fontcolor={fontColor1}>
-            {value}
-          </NewLabel>
+          <FlexDiv style={{ flexDirection: 'column', alignItems: 'flex-end', gap: 1 }}>
+            <NewLabel $size="13px" $weight="600" $height="18px" $fontcolor={fontColor1}>
+              {value}
+            </NewLabel>
+            {token && (
+              <NewLabel $size="10px" $weight="500" $height="14px" $fontcolor={fontColor3}>
+                {token}
+              </NewLabel>
+            )}
+          </FlexDiv>
         </FlexDiv>
       ))}
     </MyBalance>
@@ -561,36 +570,33 @@ const CLVault = () => {
               <ManageBoxWrapper style={{ marginBottom: 25, width: '100%' }}>
                 {managePanel({
                   title: 'Lifetime Yield',
-                        tooltipId: 'cl-tooltip-lifetime',
-                        tooltipContent:
-                          'Your lifetime yield in this vault, expressed in USD and underlying token.',
-                        badge: 'Beta',
-                        rows: [
-                          ['in USD', '$0'],
-                          ['Underlying', <>0 <span style={{ color: fontColor3, fontWeight: 500 }}>SHARES</span></>],
-                        ],
-                      })}
-                      {managePanel({
-                        title: 'Total Balance',
-                        tooltipId: 'cl-tooltip-balance',
-                        tooltipContent: 'Your share of the vault, in USD and as fTokens.',
-                        rows: [
-                          ['in USD', '$0.00'],
-                          [
-                            'fToken',
-                            <>0 <span style={{ color: fontColor3, fontWeight: 500, fontSize: 11 }}>fcl_{VAULT.pair.token0}_{VAULT.pair.token1}</span></>,
-                          ],
-                        ],
-                      })}
-                      {managePanel({
-                        title: 'Yield Estimates',
-                        tooltipId: 'cl-tooltip-estimates',
-                        tooltipContent: 'Daily and monthly yield projections, based on current APY.',
-                        rows: [
-                          ['Daily', '$0'],
-                          ['Monthly', '$0.00'],
-                        ],
-                      })}
+                  tooltipId: 'cl-tooltip-lifetime',
+                  tooltipContent:
+                    'Your lifetime yield in this vault, expressed in USD and underlying token.',
+                  badge: 'Beta',
+                  rows: [
+                    ['in USD', '$0'],
+                    ['Underlying', '0', 'SHARES'],
+                  ],
+                })}
+                {managePanel({
+                  title: 'Total Balance',
+                  tooltipId: 'cl-tooltip-balance',
+                  tooltipContent: 'Your share of the vault, in USD and as fTokens.',
+                  rows: [
+                    ['in USD', '$0.00'],
+                    ['fToken', '0', `fcl_${VAULT.pair.token0}_${VAULT.pair.token1}`],
+                  ],
+                })}
+                {managePanel({
+                  title: 'Yield Estimates',
+                  tooltipId: 'cl-tooltip-estimates',
+                  tooltipContent: 'Daily and monthly yield projections, based on current APY.',
+                  rows: [
+                    ['Daily', '$0'],
+                    ['Monthly', '$0.00'],
+                  ],
+                })}
               </ManageBoxWrapper>
 
               <MainSection $height="100%">
@@ -696,8 +702,11 @@ const CLVault = () => {
                           $fontcolor={activeDepoTab === 0 ? fontColor4 : fontColor3}
                           $backcolor={activeDepoTab === 0 ? activeColorNew : ''}
                           $boxshadow={
-                            activeDepoTab === 0 ? '0px 1px 2px rgba(16, 24, 40, 0.05)' : 'none'
+                            activeDepoTab === 0
+                              ? '0 1px 3px rgba(16, 24, 40, 0.18), 0 1px 2px rgba(16, 24, 40, 0.10)'
+                              : 'none'
                           }
+                          style={{ fontWeight: activeDepoTab === 0 ? 700 : 500, opacity: activeDepoTab === 0 ? 1 : 0.7 }}
                         >
                           <p>↓ Supply</p>
                         </SwitchTabTag>
@@ -706,8 +715,11 @@ const CLVault = () => {
                           $fontcolor={activeDepoTab === 1 ? fontColor4 : fontColor3}
                           $backcolor={activeDepoTab === 1 ? activeColorNew : ''}
                           $boxshadow={
-                            activeDepoTab === 1 ? '0px 1px 2px rgba(16, 24, 40, 0.05)' : 'none'
+                            activeDepoTab === 1
+                              ? '0 1px 3px rgba(16, 24, 40, 0.18), 0 1px 2px rgba(16, 24, 40, 0.10)'
+                              : 'none'
                           }
+                          style={{ fontWeight: activeDepoTab === 1 ? 700 : 500, opacity: activeDepoTab === 1 ? 1 : 0.7 }}
                         >
                           <p>↑ Revert</p>
                         </SwitchTabTag>
@@ -747,8 +759,8 @@ const CLVault = () => {
                             $marginbottom="14px"
                           >
                             {depMode === 'quick'
-                              ? 'Convenient single-asset deposit. We swap internally to the position’s ratio.'
-                              : 'Supply both tokens for a no-swap deposit. Smart routing picks the optimal path.'}
+                              ? 'Single-asset deposit. We auto-swap your token to match the position’s ratio.'
+                              : 'Smart routing. Fill both tokens at the optimal ratio for a no-swap deposit, or fill one for the single-asset path.'}
                           </NewLabel>
 
                           {depMode === 'quick' ? (
@@ -784,7 +796,22 @@ const CLVault = () => {
                                   Amount{' '}
                                   {quickToken === 't0' ? VAULT.pair.token0 : VAULT.pair.token1}
                                 </span>
-                                <span className="bal">Balance: 0.00</span>
+                                <span
+                                  className="bal"
+                                  onClick={() =>
+                                    setQuickAmount(
+                                      quickToken === 't0'
+                                        ? VAULT.walletBalances.token0
+                                        : VAULT.walletBalances.token1,
+                                    )
+                                  }
+                                  title="Click to use full balance"
+                                >
+                                  Balance:{' '}
+                                  {quickToken === 't0'
+                                    ? VAULT.walletBalances.token0
+                                    : VAULT.walletBalances.token1}
+                                </span>
                               </FieldLabel>
                               <FieldBox $bg={bgColorChart} $border={borderColorBox}>
                                 <Input
@@ -835,7 +862,13 @@ const CLVault = () => {
                             <>
                           <FieldLabel $fc={fontColor1} $muted={fontColor3}>
                             <span>Amount {VAULT.pair.token0}</span>
-                            <span className="bal">Balance: 0.00</span>
+                            <span
+                              className="bal"
+                              onClick={() => setDep0(VAULT.walletBalances.token0)}
+                              title="Click to use full balance"
+                            >
+                              Balance: {VAULT.walletBalances.token0}
+                            </span>
                           </FieldLabel>
                           <FieldBox $bg={bgColorChart} $border={borderColorBox}>
                             <Input
@@ -853,7 +886,13 @@ const CLVault = () => {
 
                           <FieldLabel $fc={fontColor1} $muted={fontColor3}>
                             <span>Amount {VAULT.pair.token1}</span>
-                            <span className="bal">Balance: 0.00</span>
+                            <span
+                              className="bal"
+                              onClick={() => setDep1(VAULT.walletBalances.token1)}
+                              title="Click to use full balance"
+                            >
+                              Balance: {VAULT.walletBalances.token1}
+                            </span>
                           </FieldLabel>
                           <FieldBox $bg={bgColorChart} $border={borderColorBox}>
                             <Input
@@ -1334,24 +1373,9 @@ const CLVault = () => {
                       $bordercolor={borderColorBox}
                     >
                       {sectionTitle('APY Breakdown')}
-                      <NewLabel $padding="10px 15px 0">
-                        <FlexDiv $justifycontent="space-between">
-                          <NewLabel $size="13px" $weight="500" $height="22px" $fontcolor={fontColor3}>
-                            Trading fees
-                          </NewLabel>
-                          <NewLabel $size="13px" $weight="600" $height="22px" $fontcolor={fontColor1}>
-                            ~ 18.20%
-                          </NewLabel>
-                        </FlexDiv>
-                        <FlexDiv $justifycontent="space-between">
-                          <NewLabel $size="13px" $weight="500" $height="22px" $fontcolor={fontColor3}>
-                            AERO emissions (auto-compounded)
-                          </NewLabel>
-                          <NewLabel $size="13px" $weight="600" $height="22px" $fontcolor={fontColor1}>
-                            ~ 8.26%
-                          </NewLabel>
-                        </FlexDiv>
-                      </NewLabel>
+                      {kvRow('Trading fees', '~ 18.20%', 'apy-tf')}
+                      {kvRow('AERO emissions (auto-compounded)', '~ 8.26%', 'apy-ae')}
+                      {kvRow('Net (auto-compounded)', '~ 26.46%', 'apy-net')}
                       <Tip $display={showTip ? 'block' : 'none'}>
                         <TipTop>
                           <IconPart>

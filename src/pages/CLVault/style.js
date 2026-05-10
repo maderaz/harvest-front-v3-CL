@@ -165,6 +165,12 @@ export const FieldLabel = styled.label`
   span.bal {
     color: ${p => p.$fc};
     font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  span.bal:hover {
+    opacity: 0.7;
+    text-decoration: underline;
   }
 `
 
@@ -344,11 +350,11 @@ export const Slippage = styled.div`
 export const ChartFrame = styled.div`
   position: relative;
   width: 100%;
-  height: 300px;
+  height: 320px;
   border-radius: 10px;
   background: ${p => p.$bg};
   overflow: hidden;
-  padding: 12px 6px;
+  padding: 14px 8px;
   box-sizing: border-box;
 `
 
