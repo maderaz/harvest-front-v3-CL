@@ -156,7 +156,6 @@ import {
   AxisYLeft,
   AxisYRight,
   AxisX,
-  ChartCenterText,
   RangeBtnRow,
   RangeBtn,
 } from './style'
@@ -201,7 +200,7 @@ const VAULT = {
     operatingSince: 'Mar 14 2025',
     operatingDays: 57,
     sharePrice: '1.00428',
-    apy: { live: '26.46%', d7: '24.91%', d30: '22.40%', d180: '—', d365: '—', lifetime: '23.85%' },
+    apy: { live: '26.46%', d7: '24.91%', d30: '22.40%', d180: 'n/a', d365: 'n/a', lifetime: '23.85%' },
   },
 }
 
@@ -308,22 +307,22 @@ const CLVault = () => {
     const a0 = parseFloat(dep0) > 0
     const a1 = parseFloat(dep1) > 0
     if (a0 && a1) return { label: 'Routed via CLVault.deposit (both assets)', kind: 'both' }
-    if (a0) return { label: `Routed via CLWrapper(${VAULT.pair.token0}) — single asset`, kind: 't0' }
-    if (a1) return { label: `Routed via CLWrapper(${VAULT.pair.token1}) — single asset`, kind: 't1' }
+    if (a0) return { label: `Routed via CLWrapper(${VAULT.pair.token0}): single asset`, kind: 't0' }
+    if (a1) return { label: `Routed via CLWrapper(${VAULT.pair.token1}): single asset`, kind: 't1' }
     return null
   }, [dep0, dep1])
 
   const quickRoute = useMemo(() => {
     if (!parseFloat(quickAmount)) return null
     const sym = quickToken === 't0' ? VAULT.pair.token0 : VAULT.pair.token1
-    return { label: `Routed via CLWrapper(${sym}) — single asset`, kind: quickToken, sym }
+    return { label: `Routed via CLWrapper(${sym}): single asset`, kind: quickToken, sym }
   }, [quickAmount, quickToken])
 
   const wRoute = useMemo(() => {
     if (output === 'both')
-      return `Routed via CLVault.withdraw — receive ${VAULT.pair.token0} + ${VAULT.pair.token1}`
-    if (output === 't0') return `Routed via CLWrapper(${VAULT.pair.token0}) — receive ${VAULT.pair.token0} only`
-    return `Routed via CLWrapper(${VAULT.pair.token1}) — receive ${VAULT.pair.token1} only`
+      return `Routed via CLVault.withdraw: receive ${VAULT.pair.token0} + ${VAULT.pair.token1}`
+    if (output === 't0') return `Routed via CLWrapper(${VAULT.pair.token0}): receive ${VAULT.pair.token0} only`
+    return `Routed via CLWrapper(${VAULT.pair.token1}): receive ${VAULT.pair.token1} only`
   }, [output])
 
   const balance = () => {
@@ -398,12 +397,12 @@ const CLVault = () => {
         </FlexDiv>
       </NewLabel>
       {rows.map(([label, value, token], i) => (
-        <FlexDiv key={i} $justifycontent="space-between" $padding="8px 15px" style={{ alignItems: 'flex-start' }}>
-          <NewLabel $size="12px" $weight="500" $height="20px" $fontcolor={fontColor3}>
+        <FlexDiv key={i} $justifycontent="space-between" $padding="5px 15px" style={{ alignItems: 'flex-start' }}>
+          <NewLabel $size="12px" $weight="500" $height="24px" $fontcolor={fontColor3}>
             {label}
           </NewLabel>
           <FlexDiv style={{ flexDirection: 'column', alignItems: 'flex-end', gap: 1 }}>
-            <NewLabel $size="13px" $weight="600" $height="18px" $fontcolor={fontColor1}>
+            <NewLabel $size="12px" $weight="600" $height="24px" $fontcolor={fontColor1}>
               {value}
             </NewLabel>
             {token && (
@@ -465,7 +464,38 @@ const CLVault = () => {
           <span>10/26</span>
           <span>5/10</span>
         </AxisX>
-        <ChartCenterText $muted={fontColor3}>Connect wallet to see your balance chart</ChartCenterText>
+        <svg
+          viewBox="0 0 200 100"
+          preserveAspectRatio="none"
+          style={{
+            position: 'absolute',
+            left: 38,
+            right: 38,
+            top: 12,
+            bottom: 28,
+            width: 'calc(100% - 76px)',
+            height: 'calc(100% - 40px)',
+            pointerEvents: 'none',
+          }}
+        >
+          <polyline
+            points="0,82 12,80 24,76 36,72 48,70 60,64 72,60 84,55 96,52 108,46 120,42 132,38 144,32 156,30 168,26 180,22 192,20 200,18"
+            fill="none"
+            stroke="#5dcf46"
+            strokeWidth="1.4"
+            strokeLinejoin="round"
+            strokeLinecap="round"
+          />
+          <polyline
+            points="0,86 12,85 24,82 36,80 48,77 60,74 72,70 84,66 96,62 108,57 120,52 132,48 144,42 156,38 168,32 180,28 192,24 200,22"
+            fill="none"
+            stroke="#7d68d3"
+            strokeWidth="1.4"
+            strokeDasharray="3,2"
+            strokeLinejoin="round"
+            strokeLinecap="round"
+          />
+        </svg>
       </ChartFrame>
       <RangeBtnRow>
         {TIME_RANGES.map(r => (
@@ -512,8 +542,23 @@ const CLVault = () => {
                 $height="82px"
                 $marginbottom="10px"
               >
-                Concentrated Liquidity • {VAULT.protocol} • {VAULT.pair.token0}/{VAULT.pair.token1}{' '}
-                <span style={{ fontWeight: 500, color: fontColor3 }}>{VAULT.feeTier}</span>
+                {VAULT.pair.token0}/{VAULT.pair.token1}
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    letterSpacing: 0.4,
+                    padding: '3px 8px',
+                    borderRadius: 4,
+                    background: bgColorBox,
+                    border: `1px solid ${borderColorBox}`,
+                    color: fontColor3,
+                    marginLeft: 10,
+                    verticalAlign: 'middle',
+                  }}
+                >
+                  CL
+                </span>
               </TopDesc>
             </FlexDiv>
 
@@ -546,8 +591,11 @@ const CLVault = () => {
               </MainTagPanel>
               <NetDetail>
                 <NetDetailItem>
-                  <NetDetailTitle $fontcolor={fontColor}>Platform:</NetDetailTitle>
-                  <NetDetailContent $fontcolor={fontColor}>{VAULT.protocol}</NetDetailContent>
+                  <NetDetailTitle $fontcolor={fontColor}>Strategy:</NetDetailTitle>
+                  <NetDetailContent $fontcolor={fontColor}>
+                    Concentrated Liquidity • {VAULT.protocol} • {VAULT.pair.token0}/
+                    {VAULT.pair.token1} {VAULT.feeTier}
+                  </NetDetailContent>
                 </NetDetailItem>
                 <NetDetailItem>
                   <NetDetailTitle $fontcolor={fontColor}>Network</NetDetailTitle>
@@ -660,14 +708,14 @@ const CLVault = () => {
                         <span>{VAULT.composition.token1Pct}% {VAULT.pair.token1}</span>
                       </CompositionRow>
                       <CompositionBar $border={borderColorBox}>
-                        <CompositionFill $pct={VAULT.composition.token0Pct} $color="#5dcf46" />
-                        <CompositionFill $pct={VAULT.composition.token1Pct} $color="#9ad48a" />
+                        <CompositionFill $pct={VAULT.composition.token0Pct} $color="#7d68d3" />
+                        <CompositionFill $pct={VAULT.composition.token1Pct} $color="#4f7ce0" />
                       </CompositionBar>
-                      {kvRow(`Vault holdings — ${VAULT.pair.token0}`, VAULT.composition.token0Amount, 'h0')}
-                      {kvRow(`Vault holdings — ${VAULT.pair.token1}`, VAULT.composition.token1Amount, 'h1')}
-                      {kvRow('Your slice — shares', VAULT.userSlice.shares, 'us')}
+                      {kvRow(`Vault holdings (${VAULT.pair.token0})`, VAULT.composition.token0Amount, 'h0')}
+                      {kvRow(`Vault holdings (${VAULT.pair.token1})`, VAULT.composition.token1Amount, 'h1')}
+                      {kvRow('Your slice (shares)', VAULT.userSlice.shares, 'us')}
                       {kvRow(
-                        `Your slice — ${VAULT.pair.token0} / ${VAULT.pair.token1}`,
+                        `Your slice (${VAULT.pair.token0} / ${VAULT.pair.token1})`,
                         `${VAULT.userSlice.token0} / ${VAULT.userSlice.token1}`,
                         'ut',
                       )}
@@ -759,7 +807,7 @@ const CLVault = () => {
                             $marginbottom="14px"
                           >
                             {depMode === 'quick'
-                              ? 'Single-asset deposit. We auto-swap your token to match the position’s ratio.'
+                              ? 'Single-asset deposit. The token is auto-swapped on-chain to match the position’s ratio.'
                               : 'Smart routing. Fill both tokens at the optimal ratio for a no-swap deposit, or fill one for the single-asset path.'}
                           </NewLabel>
 
@@ -998,7 +1046,7 @@ const CLVault = () => {
                               />
                             </NewLabel>
                             <NewLabel $size="13px" $weight="600" $height="20px" $fontcolor={fontColor1}>
-                              —
+                              n/a
                             </NewLabel>
                           </FlexDiv>
                           <FlexDiv $justifycontent="space-between" style={{ marginBottom: 14 }}>
@@ -1011,7 +1059,7 @@ const CLVault = () => {
                               />
                             </NewLabel>
                             <NewLabel $size="13px" $weight="600" $height="20px" $fontcolor={fontColor1}>
-                              —
+                              n/a
                             </NewLabel>
                           </FlexDiv>
 
@@ -1141,11 +1189,11 @@ const CLVault = () => {
                             {output === 'both' ? (
                               <>
                                 <div>
-                                  <span className="muted">Predicted output — {VAULT.pair.token0}</span>
+                                  <span className="muted">Predicted output ({VAULT.pair.token0})</span>
                                   <span className="val">~ 0.0000</span>
                                 </div>
                                 <div>
-                                  <span className="muted">Predicted output — {VAULT.pair.token1}</span>
+                                  <span className="muted">Predicted output ({VAULT.pair.token1})</span>
                                   <span className="val">~ 0.0000</span>
                                 </div>
                               </>
@@ -1153,8 +1201,8 @@ const CLVault = () => {
                               <>
                                 <div>
                                   <span className="muted">
-                                    Predicted output —{' '}
-                                    {output === 't0' ? VAULT.pair.token0 : VAULT.pair.token1}
+                                    Predicted output (
+                                    {output === 't0' ? VAULT.pair.token0 : VAULT.pair.token1})
                                   </span>
                                   <span className="val">~ 0.0000</span>
                                 </div>
@@ -1255,9 +1303,29 @@ const CLVault = () => {
                         <span>4/24</span>
                         <span>5/10</span>
                       </AxisX>
-                      <ChartCenterText $muted={fontColor3}>
-                        Share price history
-                      </ChartCenterText>
+                      <svg
+                        viewBox="0 0 200 100"
+                        preserveAspectRatio="none"
+                        style={{
+                          position: 'absolute',
+                          left: 38,
+                          right: 8,
+                          top: 12,
+                          bottom: 28,
+                          width: 'calc(100% - 46px)',
+                          height: 'calc(100% - 40px)',
+                          pointerEvents: 'none',
+                        }}
+                      >
+                        <polyline
+                          points="0,90 8,89 16,88 24,86 32,85 40,83 48,82 56,80 64,78 72,76 80,73 88,71 96,68 104,66 112,63 120,60 128,57 136,53 144,50 152,46 160,42 168,38 176,34 184,30 192,26 200,22"
+                          fill="none"
+                          stroke="#5dcf46"
+                          strokeWidth="1.5"
+                          strokeLinejoin="round"
+                          strokeLinecap="round"
+                        />
+                      </svg>
                     </ChartFrame>
                     <RangeBtnRow>
                       {['Custom', '1W', '1M', '1Y', 'ALL'].map(r => (
@@ -1282,12 +1350,12 @@ const CLVault = () => {
                     $bordercolor={borderColorBox}
                   >
                     {sectionTitle('How this vault works')}
-                    <NewLabel $padding="14px 15px 6px" $size="13.5px" $weight="400" $height="22px" $fontcolor={fontColor1}>
-                      Your deposit lands in a concentrated liquidity position sitting tightly around
-                      the current price. Trading fees and AERO emissions auto-compound back into the
-                      same range — you do not need to claim or restake.
+                    <NewLabel $padding="14px 15px 6px" $size="13.5px" $weight="400" $height="22px" $fontcolor={fontColor3}>
+                      Deposits are placed into a concentrated liquidity position sitting tightly
+                      around the current price. Trading fees and AERO emissions auto-compound back
+                      into the same range. No claim or restake action is required.
                     </NewLabel>
-                    <NewLabel $padding="0 15px 12px" $size="13.5px" $weight="400" $height="22px" $fontcolor={fontColor1}>
+                    <NewLabel $padding="0 15px 12px" $size="13.5px" $weight="400" $height="22px" $fontcolor={fontColor3}>
                       When price drifts beyond the deviation trigger, the vault re-centers the range
                       around the new spot. Rebalances are TWAP-gated, so a single block of price
                       manipulation cannot trick the contract into swapping at a bad price.
@@ -1357,7 +1425,7 @@ const CLVault = () => {
                         'op',
                       )}
                       {kvRow('SharePrice', VAULT.details.sharePrice, 'sp')}
-                      {sectionTitle('APY — Live & Historical Average')}
+                      {sectionTitle('APY: Live & Historical Average')}
                       {kvRow('Live', VAULT.details.apy.live, 'apy-l')}
                       {kvRow('7d', VAULT.details.apy.d7, 'apy-7')}
                       {kvRow('30d', VAULT.details.apy.d30, 'apy-30')}
@@ -1408,8 +1476,8 @@ const CLVault = () => {
                       {sectionTitle('Fees')}
                       {kvRow('Entry / Exit fee', `${VAULT.costs.entryFee} / ${VAULT.costs.exitFee}`, 'fe')}
                       {kvRow('Profit share', VAULT.costs.profitShare, 'ps')}
-                      {kvRow('Typical interaction — both assets', VAULT.costs.balanced, 'tb')}
-                      {kvRow('Typical interaction — single asset', VAULT.costs.singleAsset, 'ts')}
+                      {kvRow('Typical interaction (both assets)', VAULT.costs.balanced, 'tb')}
+                      {kvRow('Typical interaction (single asset)', VAULT.costs.singleAsset, 'ts')}
                       <FlexDiv $justifycontent="space-between" $padding="10px 15px">
                         <NewLabel $size="13px" $weight="300" $height="normal" $fontcolor={fontColor3}>
                           Per-rebalance swap slippage is borne by the vault and shows up as small
