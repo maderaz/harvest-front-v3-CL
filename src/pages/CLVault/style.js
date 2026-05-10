@@ -344,7 +344,7 @@ export const Slippage = styled.div`
 export const ChartFrame = styled.div`
   position: relative;
   width: 100%;
-  height: 220px;
+  height: 300px;
   border-radius: 10px;
   background: ${p => p.$bg};
   overflow: hidden;
