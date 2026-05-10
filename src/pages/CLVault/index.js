@@ -104,6 +104,7 @@ import {
   EarningsBadge,
   FirstPartSection,
   RestInternal,
+  InternalSection,
   HalfInfo,
   LastHarvestInfo,
   Tip,
@@ -538,13 +539,11 @@ const CLVault = () => {
         <BigDiv>
           {/* MANAGE TAB */}
           {activeMainTag === 0 && (
-            <FirstPartSection>
-              <BoxCover $bordercolor={borderColorBox}>
-                <ManageBoxWrapper>
-                  <MainSection>
-                    <ManageBoxWrapper style={{ marginBottom: 25 }}>
-                      {managePanel({
-                        title: 'Lifetime Yield',
+            <InternalSection>
+              {/* Top row: 3 stats panels — full width, sibling of MainSection */}
+              <ManageBoxWrapper style={{ marginBottom: 25, width: '100%' }}>
+                {managePanel({
+                  title: 'Lifetime Yield',
                         tooltipId: 'cl-tooltip-lifetime',
                         tooltipContent:
                           'Your lifetime yield in this vault, expressed in USD and underlying token.',
@@ -575,9 +574,10 @@ const CLVault = () => {
                           ['Monthly', '$0.00'],
                         ],
                       })}
-                    </ManageBoxWrapper>
+              </ManageBoxWrapper>
 
-                    {/* Active Range — CL-specific card, classic chrome */}
+              <MainSection $height="100%">
+                {/* Active Range — CL-specific card, classic chrome */}
                     <HalfInfo
                       $backcolor={bgColorBox}
                       $bordercolor={borderColorBox}
@@ -1028,18 +1028,16 @@ const CLVault = () => {
                           </Cta>
                         </>
                       )}
-                    </HalfContent>
-                  </RestContent>
-                </ManageBoxWrapper>
-              </BoxCover>
-            </FirstPartSection>
+                </HalfContent>
+              </RestContent>
+            </InternalSection>
           )}
 
           {/* DETAILS TAB */}
           {activeMainTag === 1 && (
-            <FirstPartSection>
-              {/* 4 top boxes — exact classic structure */}
-              <BoxCover $bordercolor={borderColorBox}>
+            <InternalSection>
+              {/* 4 top boxes — full row, sibling of MainSection */}
+              <BoxCover $bordercolor={borderColorBox} style={{ width: '100%' }}>
                 {[
                   { title: 'Live APY', value: VAULT.apy, className: 'balance-box' },
                   { title: 'Daily APY', value: '0.072%', className: 'daily-apy-box' },
@@ -1059,9 +1057,8 @@ const CLVault = () => {
                 ))}
               </BoxCover>
 
-              <ManageBoxWrapper>
-                <MainSection>
-                  {/* Share Price chart placeholder */}
+              <MainSection $height="fit-content">
+                {/* Share Price chart placeholder */}
                   <HalfInfo
                     $padding="20px"
                     $marginbottom="25px"
@@ -1307,10 +1304,9 @@ const CLVault = () => {
                         </>
                       )}
                     </LastHarvestInfo>
-                  </RestInternal>
-                </RestContent>
-              </ManageBoxWrapper>
-            </FirstPartSection>
+                </RestInternal>
+              </RestContent>
+            </InternalSection>
           )}
 
           {/* HISTORY TAB */}
