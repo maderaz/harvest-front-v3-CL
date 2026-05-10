@@ -1,6 +1,9 @@
 import React, { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { BiLeftArrowAlt } from 'react-icons/bi'
+import { PiQuestion } from 'react-icons/pi'
+import { IoCloseOutline } from 'react-icons/io5'
+import { Tooltip } from 'react-tooltip'
 import { useThemeContext } from '../../providers/useThemeContext'
 import Safe from '../../assets/images/logos/beginners/safe.svg'
 import BarChart from '../../assets/images/logos/beginners/bar-chart-01.svg'
@@ -54,7 +57,6 @@ import {
   CompositionFill,
   KVList,
   KVRow,
-  Para,
   Caret,
   FieldLabel,
   FieldBox,
@@ -71,7 +73,32 @@ import {
   CardHeader,
   CardTitle,
   CardSub,
-  ChartPlaceholder,
+  ChartHeader,
+  ChartHeaderCol,
+  ChartLabel,
+  ChartMeta,
+  ChartFrame,
+  AxisYLeft,
+  AxisYRight,
+  AxisX,
+  ChartCenterText,
+  RangeBtnRow,
+  RangeBtn,
+  TopBoxRow,
+  TopBox,
+  TopBoxTitle,
+  TopBoxValue,
+  DetailsGrid,
+  DetailsCol,
+  SectionTitle,
+  InfoRow,
+  SourceText,
+  AddressBtnRow,
+  AddressBtn,
+  TipBox,
+  TipBoxIcon,
+  TipBoxText,
+  FormRow,
 } from './style'
 
 const VAULT = {
@@ -107,11 +134,17 @@ const VAULT = {
   costs: {
     entryFee: '0%',
     exitFee: '0%',
-    profitShare: '10% on harvested rewards',
+    profitShare: '10%',
     balanced: '~12 bps',
     singleAsset: '~28 bps',
   },
   optimalRatio: { token0: 0.62, token1: 0.38 },
+  details: {
+    operatingSince: 'Mar 14 2025',
+    operatingDays: 57,
+    sharePrice: '1.00428',
+    apy: { live: '26.46%', d7: '24.91%', d30: '22.40%', d180: '—', d365: '—', lifetime: '23.85%' },
+  },
 }
 
 const TokenCircle = ({ children, bg, fc, border, overlap }) => (
@@ -144,6 +177,29 @@ const TAB_DEFS = [
   { name: 'History', img: HistoryIcon },
 ]
 
+const TIME_RANGES = ['Custom', '1D', '1W', '1M', 'ALL', 'LAST']
+
+const Question = ({ id, content, dark }) => (
+  <>
+    <PiQuestion
+      className="question"
+      data-tip
+      id={id}
+      style={{ cursor: 'pointer', flexShrink: 0, fontSize: 14, marginLeft: 4 }}
+    />
+    <Tooltip
+      id={id}
+      anchorSelect={`#${id}`}
+      backgroundColor={dark ? 'white' : '#101828'}
+      borderColor={dark ? 'white' : 'black'}
+      textColor={dark ? 'black' : 'white'}
+      style={{ maxWidth: 260, fontSize: 12, lineHeight: 1.4 }}
+    >
+      {content}
+    </Tooltip>
+  </>
+)
+
 const CLVault = () => {
   const {
     darkMode,
@@ -167,6 +223,9 @@ const CLVault = () => {
   const [activeDepoTab, setActiveDepoTab] = useState(0)
   const [paramsOpen, setParamsOpen] = useState(false)
   const [agreed, setAgreed] = useState(false)
+  const [chartRange, setChartRange] = useState('LAST')
+  const [detailRange, setDetailRange] = useState('1Y')
+  const [showTip, setShowTip] = useState(true)
 
   const [dep0, setDep0] = useState('')
   const [dep1, setDep1] = useState('')
@@ -207,6 +266,73 @@ const CLVault = () => {
 
   const supplyDisabled = !depRoute || !agreed
   const withdrawDisabled = !parseFloat(shares)
+
+  const today = new Date().toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
+
+  const renderBalanceChart = () => (
+    <HalfInfo
+      $backcolor={bgColorBox}
+      $bordercolor={borderColorBox}
+      $marginbottom="0"
+      $padding="20px"
+    >
+      <ChartHeader>
+        <ChartHeaderCol>
+          <ChartLabel $color="#5dcf46">USD Balance</ChartLabel>
+          <ChartMeta $muted={fontColor3} $fc={fontColor1}>
+            {today} <strong>$0.00</strong>
+          </ChartMeta>
+        </ChartHeaderCol>
+        <ChartHeaderCol style={{ alignItems: 'flex-end' }}>
+          <ChartLabel $color="#7d68d3">Underlying Balance</ChartLabel>
+          <ChartMeta $muted={fontColor3} $fc={fontColor1}>
+            <strong>0</strong>
+          </ChartMeta>
+        </ChartHeaderCol>
+      </ChartHeader>
+      <ChartFrame $bg={bgColorChart}>
+        <AxisYLeft $muted={fontColor3}>
+          <span>$1.08</span>
+          <span>$0.88</span>
+          <span>$0.49</span>
+          <span>$0.30</span>
+        </AxisYLeft>
+        <AxisYRight $muted={fontColor3}>
+          <span>0.00023</span>
+          <span>0.00022</span>
+          <span>0.00021</span>
+          <span>0.00020</span>
+        </AxisYRight>
+        <AxisX $muted={fontColor3}>
+          <span>5/14</span>
+          <span>9/23</span>
+          <span>2/5</span>
+          <span>6/17</span>
+          <span>10/26</span>
+          <span>5/10</span>
+        </AxisX>
+        <ChartCenterText $muted={fontColor3}>Connect wallet to see your balance chart</ChartCenterText>
+      </ChartFrame>
+      <RangeBtnRow>
+        {TIME_RANGES.map(r => (
+          <RangeBtn
+            key={r}
+            type="button"
+            $active={chartRange === r}
+            $muted={fontColor3}
+            $fc={fontColor1}
+            onClick={() => setChartRange(r)}
+          >
+            {r}
+          </RangeBtn>
+        ))}
+      </RangeBtnRow>
+    </HalfInfo>
+  )
 
   return (
     <DetailView $backcolor={bgColorNew} $fontcolor={fontColor1}>
@@ -312,6 +438,11 @@ const CLVault = () => {
                         >
                           <FlexDiv>
                             Lifetime Yield <EarningsBadge>Beta</EarningsBadge>
+                            <Question
+                              id="cl-tooltip-lifetime"
+                              dark={darkMode}
+                              content="Your lifetime yield in this vault, expressed in USD and underlying token."
+                            />
                           </FlexDiv>
                         </NewLabel>
                         <FlexDiv style={{ justifyContent: 'space-between', padding: '12px 15px' }}>
@@ -333,6 +464,8 @@ const CLVault = () => {
                         $height="120px"
                       >
                         <NewLabel
+                          $display="flex"
+                          $justifycontent="space-between"
                           $size="12px"
                           $weight="600"
                           $height="20px"
@@ -340,7 +473,14 @@ const CLVault = () => {
                           $padding="10px 15px"
                           $borderbottom={`1px solid ${borderColorBox}`}
                         >
-                          Total Balance
+                          <FlexDiv>
+                            Total Balance
+                            <Question
+                              id="cl-tooltip-balance"
+                              dark={darkMode}
+                              content="Your share of the vault, in USD and as fTokens."
+                            />
+                          </FlexDiv>
                         </NewLabel>
                         <FlexDiv style={{ justifyContent: 'space-between', padding: '12px 15px' }}>
                           <span style={{ fontSize: 12, color: fontColor3 }}>in USD</span>
@@ -364,6 +504,8 @@ const CLVault = () => {
                         $height="120px"
                       >
                         <NewLabel
+                          $display="flex"
+                          $justifycontent="space-between"
                           $size="12px"
                           $weight="600"
                           $height="20px"
@@ -371,7 +513,14 @@ const CLVault = () => {
                           $padding="10px 15px"
                           $borderbottom={`1px solid ${borderColorBox}`}
                         >
-                          Yield Estimates
+                          <FlexDiv>
+                            Yield Estimates
+                            <Question
+                              id="cl-tooltip-estimates"
+                              dark={darkMode}
+                              content="Daily and monthly yield projections, based on current APY."
+                            />
+                          </FlexDiv>
                         </NewLabel>
                         <FlexDiv style={{ justifyContent: 'space-between', padding: '12px 15px' }}>
                           <span style={{ fontSize: 12, color: fontColor3 }}>Daily</span>
@@ -416,7 +565,7 @@ const CLVault = () => {
                       <Footnote $muted={fontColor3}>Last rebalance: {VAULT.lastRebalance}.</Footnote>
                     </Card>
 
-                    {/* Position Composition — also key for user decision */}
+                    {/* Position Composition */}
                     <Card $bg={bgColorBox} $border={borderColorBox} style={{ marginBottom: 25 }}>
                       <CardHeader>
                         <div>
@@ -462,25 +611,7 @@ const CLVault = () => {
                       </KVList>
                     </Card>
 
-                    {/* Chart placeholder */}
-                    <HalfInfo
-                      $backcolor={bgColorBox}
-                      $bordercolor={borderColorBox}
-                      $marginbottom="0"
-                      $padding="20px"
-                    >
-                      <FlexDiv style={{ justifyContent: 'space-between', marginBottom: 14 }}>
-                        <span style={{ fontSize: 14, fontWeight: 700, color: '#5dcf46' }}>
-                          USD Balance
-                        </span>
-                        <span style={{ fontSize: 14, fontWeight: 700, color: '#7d68d3' }}>
-                          Underlying Balance
-                        </span>
-                      </FlexDiv>
-                      <ChartPlaceholder $bg={bgColorChart} $muted={fontColor3}>
-                        Connect wallet to see your balance chart
-                      </ChartPlaceholder>
-                    </HalfInfo>
+                    {renderBalanceChart()}
                   </MainSection>
 
                   <RestContent>
@@ -506,7 +637,7 @@ const CLVault = () => {
                           padding: 4,
                           display: 'flex',
                           justifyContent: 'center',
-                          marginBottom: 20,
+                          marginBottom: 16,
                         }}
                       >
                         <SwitchTabTag
@@ -538,7 +669,7 @@ const CLVault = () => {
                             $weight="500"
                             $height="20px"
                             $fontcolor={fontColor3}
-                            style={{ marginBottom: 12 }}
+                            style={{ marginBottom: 14 }}
                           >
                             Supply your crypto into interest-bearing fTokens.
                           </NewLabel>
@@ -657,13 +788,40 @@ const CLVault = () => {
                             </div>
                           </Slippage>
 
+                          <FormRow $muted={fontColor3} $fc={fontColor1}>
+                            <span>
+                              Est. Yearly Yield
+                              <Question
+                                id="cl-tooltip-yearly"
+                                dark={darkMode}
+                                content="Estimated yield over a year, based on current APY."
+                              />
+                            </span>
+                            <span>—</span>
+                          </FormRow>
+                          <FormRow $muted={fontColor3} $fc={fontColor1} style={{ marginBottom: 14 }}>
+                            <span>
+                              Est. Received
+                              <Question
+                                id="cl-tooltip-received"
+                                dark={darkMode}
+                                content="Approximate fTokens you'd receive at the current share price."
+                              />
+                            </span>
+                            <span>—</span>
+                          </FormRow>
+
                           <label
                             style={{
                               display: 'flex',
                               alignItems: 'flex-start',
-                              gap: 8,
+                              gap: 10,
+                              padding: '12px 14px',
+                              background: bgColorChart,
+                              border: `1px solid ${borderColorBox}`,
+                              borderRadius: 10,
                               fontSize: 12,
-                              lineHeight: 1.4,
+                              lineHeight: 1.45,
                               color: fontColor3,
                               marginBottom: 14,
                               cursor: 'pointer',
@@ -673,7 +831,7 @@ const CLVault = () => {
                               type="checkbox"
                               checked={agreed}
                               onChange={e => setAgreed(e.target.checked)}
-                              style={{ marginTop: 3 }}
+                              style={{ marginTop: 3, accentColor: '#5dcf46' }}
                             />
                             <span>
                               I confirm that I have read and understand the product, have read the{' '}
@@ -681,7 +839,7 @@ const CLVault = () => {
                                 href="https://docs.harvest.finance/legal/risk-disclosures"
                                 target="_blank"
                                 rel="noreferrer"
-                                style={{ color: '#5dcf46', fontWeight: 600 }}
+                                style={{ color: '#1da64a', fontWeight: 700 }}
                               >
                                 Risk Disclosures
                               </a>
@@ -690,7 +848,7 @@ const CLVault = () => {
                                 href="https://docs.harvest.finance/legal/terms-and-conditions"
                                 target="_blank"
                                 rel="noreferrer"
-                                style={{ color: '#5dcf46', fontWeight: 600 }}
+                                style={{ color: '#1da64a', fontWeight: 700 }}
                               >
                                 Terms and Conditions
                               </a>
@@ -713,7 +871,7 @@ const CLVault = () => {
                             $weight="500"
                             $height="20px"
                             $fontcolor={fontColor3}
-                            style={{ marginBottom: 12 }}
+                            style={{ marginBottom: 14 }}
                           >
                             Withdraw your shares back to {VAULT.pair.token0} or {VAULT.pair.token1}.
                           </NewLabel>
@@ -846,113 +1004,338 @@ const CLVault = () => {
 
           {activeMainTag === 1 && (
             <FirstPartSection>
-              <div style={{ width: '100%', maxWidth: 900 }}>
-                <Card $bg={bgColorBox} $border={borderColorBox} style={{ marginBottom: 20 }}>
-                  <CardHeader>
-                    <CardTitle $fc={fontColor1}>How this vault works</CardTitle>
-                  </CardHeader>
-                  <Para $fc={fontColor1} $accent={fontColor1}>
-                    Your deposit lands in a <strong>concentrated liquidity position</strong>{' '}
-                    sitting tightly around the current price. Trading fees and{' '}
-                    <strong>AERO emissions auto-compound</strong> back into the same range — you do
-                    not need to claim or restake.
-                  </Para>
-                  <Para $fc={fontColor1} $accent={fontColor1}>
-                    When price drifts beyond the deviation trigger, the vault{' '}
-                    <strong>re-centers the range</strong> around the new spot. Rebalances are{' '}
-                    <strong>TWAP-gated</strong>, so a single block of price manipulation cannot
-                    trick the contract into swapping at a bad price.
-                  </Para>
-                  <KVList>
-                    <KVRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
-                      <span>Fee tier</span>
-                      <span>{VAULT.feeTier}</span>
-                    </KVRow>
-                    <KVRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
-                      <span>Rebalance cooldown</span>
-                      <span>{VAULT.params.rebalanceCooldown}</span>
-                    </KVRow>
-                  </KVList>
-                </Card>
+              {/* Top 4 panels */}
+              <TopBoxRow>
+                <TopBox $bg={bgColorBox} $border={borderColorBox}>
+                  <TopBoxTitle $muted={fontColor3}>Live APY</TopBoxTitle>
+                  <TopBoxValue $fc={fontColor1}>{VAULT.apy}</TopBoxValue>
+                </TopBox>
+                <TopBox $bg={bgColorBox} $border={borderColorBox}>
+                  <TopBoxTitle $muted={fontColor3}>Daily APY</TopBoxTitle>
+                  <TopBoxValue $fc={fontColor1}>0.072%</TopBoxValue>
+                </TopBox>
+                <TopBox $bg={bgColorBox} $border={borderColorBox}>
+                  <TopBoxTitle $muted={fontColor3}>TVL</TopBoxTitle>
+                  <TopBoxValue $fc={fontColor1}>{VAULT.tvl}</TopBoxValue>
+                </TopBox>
+                <TopBox $bg={bgColorBox} $border={borderColorBox}>
+                  <TopBoxTitle $muted={fontColor3}>Last Rebalance</TopBoxTitle>
+                  <TopBoxValue $fc={fontColor1}>{VAULT.lastRebalance}</TopBoxValue>
+                </TopBox>
+              </TopBoxRow>
 
-                <Card $bg={bgColorBox} $border={borderColorBox} style={{ marginBottom: 20 }}>
-                  <CardHeader
-                    $clickable
-                    $noMargin={!paramsOpen}
-                    onClick={() => setParamsOpen(o => !o)}
+              <DetailsGrid>
+                <DetailsCol>
+                  {/* Share Price chart */}
+                  <HalfInfo
+                    $backcolor={bgColorBox}
+                    $bordercolor={borderColorBox}
+                    $marginbottom="0"
+                    $padding="20px"
                   >
-                    <div>
-                      <CardTitle $fc={fontColor1}>Range parameters</CardTitle>
-                      <CardSub $muted={fontColor3}>Advanced — for the LP-curious.</CardSub>
-                    </div>
-                    <Caret $muted={fontColor3} $open={paramsOpen}>
-                      ▼
-                    </Caret>
-                  </CardHeader>
-                  {paramsOpen && (
-                    <KVList>
-                      <KVRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
-                        <span>Target width</span>
-                        <span>{VAULT.params.targetWidth}</span>
-                      </KVRow>
-                      <KVRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
-                        <span>Current width</span>
-                        <span>{VAULT.params.currentWidth}</span>
-                      </KVRow>
-                      <KVRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
-                        <span>Rebalance cooldown</span>
-                        <span>{VAULT.params.rebalanceCooldown}</span>
-                      </KVRow>
-                      <KVRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
-                        <span>Deviation trigger</span>
-                        <span>{VAULT.params.deviationTrigger}</span>
-                      </KVRow>
-                      <KVRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
-                        <span>TWAP window</span>
-                        <span>{VAULT.params.twapWindow}</span>
-                      </KVRow>
-                      <KVRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
-                        <span>Max swap per rebalance</span>
-                        <span>{VAULT.params.maxSwap}</span>
-                      </KVRow>
-                      <KVRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
-                        <span>Internal slippage cap</span>
-                        <span>{VAULT.params.slippageBps}</span>
-                      </KVRow>
-                    </KVList>
-                  )}
-                </Card>
+                    <ChartHeader>
+                      <ChartHeaderCol>
+                        <ChartLabel $color={fontColor1}>Share Price</ChartLabel>
+                        <ChartMeta $muted={fontColor3} $fc={fontColor1}>
+                          {today} <strong>{VAULT.details.sharePrice}</strong>
+                        </ChartMeta>
+                      </ChartHeaderCol>
+                    </ChartHeader>
+                    <ChartFrame $bg={bgColorChart}>
+                      <AxisYLeft $muted={fontColor3}>
+                        <span>1.012</span>
+                        <span>1.008</span>
+                        <span>1.004</span>
+                        <span>1.000</span>
+                      </AxisYLeft>
+                      <AxisX $muted={fontColor3}>
+                        <span>3/14</span>
+                        <span>4/4</span>
+                        <span>4/24</span>
+                        <span>5/10</span>
+                      </AxisX>
+                      <ChartCenterText $muted={fontColor3}>
+                        Share price history (mock)
+                      </ChartCenterText>
+                    </ChartFrame>
+                    <RangeBtnRow>
+                      {['Custom', '1W', '1M', '1Y', 'ALL'].map(r => (
+                        <RangeBtn
+                          key={r}
+                          type="button"
+                          $active={detailRange === r}
+                          $muted={fontColor3}
+                          $fc={fontColor1}
+                          onClick={() => setDetailRange(r)}
+                        >
+                          {r}
+                        </RangeBtn>
+                      ))}
+                    </RangeBtnRow>
+                  </HalfInfo>
 
-                <Card $bg={bgColorBox} $border={borderColorBox}>
-                  <CardHeader>
-                    <CardTitle $fc={fontColor1}>Costs</CardTitle>
-                  </CardHeader>
-                  <KVList>
-                    <KVRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
-                      <span>Vault fees — entry / exit</span>
+                  {/* Source of Yield */}
+                  <HalfInfo
+                    $backcolor={bgColorBox}
+                    $bordercolor={borderColorBox}
+                    $marginbottom="0"
+                    $padding="20px"
+                  >
+                    <NewLabel
+                      $size="14px"
+                      $weight="700"
+                      $height="20px"
+                      $fontcolor={fontColor1}
+                      style={{ marginBottom: 12 }}
+                    >
+                      Source of Yield
+                    </NewLabel>
+                    <SourceText $fc={fontColor1} $muted={fontColor3}>
+                      The vault deploys{' '}
+                      <strong>
+                        {VAULT.pair.token0} / {VAULT.pair.token1}
+                      </strong>{' '}
+                      into a <strong>concentrated liquidity</strong> position on{' '}
+                      <strong>{VAULT.protocol}</strong>, earning swap fees and{' '}
+                      <strong>AERO emissions</strong>. The position is auto-re-centered when price
+                      drifts beyond the deviation trigger; rebalances are TWAP-gated. Earned rewards
+                      auto-compound back into the same range.
+                    </SourceText>
+                    <AddressBtnRow>
+                      <AddressBtn $bg={bgColorChart} $border={borderColorBox} $fc={fontColor1}>
+                        Vault Address
+                      </AddressBtn>
+                      <AddressBtn $bg={bgColorChart} $border={borderColorBox} $fc={fontColor1}>
+                        Strategy Address
+                      </AddressBtn>
+                      <AddressBtn $bg={bgColorChart} $border={borderColorBox} $fc={fontColor1}>
+                        Pool Address
+                      </AddressBtn>
+                      <AddressBtn $bg={bgColorChart} $border={borderColorBox} $fc={fontColor1}>
+                        Add Liquidity
+                      </AddressBtn>
+                    </AddressBtnRow>
+                  </HalfInfo>
+                </DetailsCol>
+
+                <DetailsCol>
+                  {/* Info card */}
+                  <HalfInfo
+                    $backcolor={bgColorBox}
+                    $bordercolor={borderColorBox}
+                    $marginbottom="0"
+                  >
+                    <SectionTitle $fc={fontColor1} $border={borderColorBox}>
+                      Info
+                    </SectionTitle>
+                    <InfoRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
+                      <span>Operating since</span>
+                      <span>
+                        {VAULT.details.operatingSince} ({VAULT.details.operatingDays} days)
+                      </span>
+                    </InfoRow>
+                    <InfoRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
+                      <span>SharePrice</span>
+                      <span>{VAULT.details.sharePrice}</span>
+                    </InfoRow>
+                    <SectionTitle
+                      $fc={fontColor1}
+                      $border={borderColorBox}
+                      style={{ marginTop: 4 }}
+                    >
+                      APY — Live & Historical Average
+                    </SectionTitle>
+                    <InfoRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
+                      <span>Live</span>
+                      <span>{VAULT.details.apy.live}</span>
+                    </InfoRow>
+                    <InfoRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
+                      <span>7d</span>
+                      <span>{VAULT.details.apy.d7}</span>
+                    </InfoRow>
+                    <InfoRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
+                      <span>30d</span>
+                      <span>{VAULT.details.apy.d30}</span>
+                    </InfoRow>
+                    <InfoRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
+                      <span>180d</span>
+                      <span>{VAULT.details.apy.d180}</span>
+                    </InfoRow>
+                    <InfoRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
+                      <span>365d</span>
+                      <span>{VAULT.details.apy.d365}</span>
+                    </InfoRow>
+                    <InfoRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
+                      <span>Lifetime</span>
+                      <span>{VAULT.details.apy.lifetime}</span>
+                    </InfoRow>
+                  </HalfInfo>
+
+                  {/* APY Breakdown */}
+                  <HalfInfo
+                    $backcolor={bgColorBox}
+                    $bordercolor={borderColorBox}
+                    $marginbottom="0"
+                  >
+                    <SectionTitle $fc={fontColor1} $border={borderColorBox}>
+                      APY Breakdown
+                    </SectionTitle>
+                    <div style={{ padding: '14px 18px 4px' }}>
+                      <KVList>
+                        <KVRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
+                          <span>Trading fees</span>
+                          <span>~ 18.20%</span>
+                        </KVRow>
+                        <KVRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
+                          <span>AERO emissions (auto-compounded)</span>
+                          <span>~ 8.26%</span>
+                        </KVRow>
+                      </KVList>
+                    </div>
+                    {showTip && (
+                      <TipBox $bg="#eafbe6" $border="#bfe6b1">
+                        <TipBoxIcon>i</TipBoxIcon>
+                        <TipBoxText $fc="#137a3a" $accent="#0d5e2a">
+                          <strong>Tip</strong>
+                          For a quick guide on tracking yield sources in your Portfolio, check our
+                          5-minute article{' '}
+                          <a
+                            href="https://medium.com/harvest-finance"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Yield Sources on Harvest – How to Track Them.
+                          </a>
+                        </TipBoxText>
+                        <button
+                          type="button"
+                          onClick={() => setShowTip(false)}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: '#137a3a',
+                            padding: 0,
+                            marginLeft: 'auto',
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                          }}
+                        >
+                          <IoCloseOutline fontSize={18} />
+                        </button>
+                      </TipBox>
+                    )}
+                  </HalfInfo>
+
+                  {/* Fees */}
+                  <HalfInfo
+                    $backcolor={bgColorBox}
+                    $bordercolor={borderColorBox}
+                    $marginbottom="0"
+                  >
+                    <SectionTitle $fc={fontColor1} $border={borderColorBox}>
+                      Fees
+                    </SectionTitle>
+                    <InfoRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
+                      <span>Entry / Exit fee</span>
                       <span>
                         {VAULT.costs.entryFee} / {VAULT.costs.exitFee}
                       </span>
-                    </KVRow>
-                    <KVRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
-                      <span>Profit share</span>
+                    </InfoRow>
+                    <InfoRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
+                      <span>Profit share (on harvested rewards)</span>
                       <span>{VAULT.costs.profitShare}</span>
-                    </KVRow>
-                    <KVRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
-                      <span>Typical interaction cost — both assets</span>
+                    </InfoRow>
+                    <InfoRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
+                      <span>Typical interaction — both assets</span>
                       <span>{VAULT.costs.balanced}</span>
-                    </KVRow>
-                    <KVRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
-                      <span>Typical interaction cost — single asset</span>
+                    </InfoRow>
+                    <InfoRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
+                      <span>Typical interaction — single asset (via wrapper)</span>
                       <span>{VAULT.costs.singleAsset}</span>
-                    </KVRow>
-                  </KVList>
-                  <Footnote $muted={fontColor3}>
-                    Per-rebalance swap slippage is borne by the vault and shows up as small
-                    share-price jitter, not as a per-user fee.
-                  </Footnote>
-                </Card>
-              </div>
+                    </InfoRow>
+                    <div
+                      style={{
+                        padding: '12px 18px 14px',
+                        fontSize: 12,
+                        color: fontColor3,
+                        lineHeight: 1.5,
+                        display: 'flex',
+                        gap: 6,
+                        alignItems: 'flex-start',
+                      }}
+                    >
+                      <span>
+                        Per-rebalance swap slippage is borne by the vault and shows up as small
+                        share-price jitter, not as a per-user fee.
+                      </span>
+                      <Question
+                        id="cl-tooltip-jitter"
+                        dark={darkMode}
+                        content="The vault pays its own swap costs during rebalances; this shows up as small share-price movement, not a fee on your deposit."
+                      />
+                    </div>
+                  </HalfInfo>
+
+                  {/* Range parameters (collapsed) */}
+                  <HalfInfo
+                    $backcolor={bgColorBox}
+                    $bordercolor={borderColorBox}
+                    $marginbottom="0"
+                  >
+                    <div
+                      onClick={() => setParamsOpen(o => !o)}
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '12px 18px',
+                        borderBottom: paramsOpen ? `1px solid ${borderColorBox}` : 'none',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <span style={{ fontSize: 14, fontWeight: 700, color: fontColor1 }}>
+                        Range parameters
+                      </span>
+                      <Caret $muted={fontColor3} $open={paramsOpen}>
+                        ▼
+                      </Caret>
+                    </div>
+                    {paramsOpen && (
+                      <>
+                        <InfoRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
+                          <span>Target width</span>
+                          <span>{VAULT.params.targetWidth}</span>
+                        </InfoRow>
+                        <InfoRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
+                          <span>Current width</span>
+                          <span>{VAULT.params.currentWidth}</span>
+                        </InfoRow>
+                        <InfoRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
+                          <span>Rebalance cooldown</span>
+                          <span>{VAULT.params.rebalanceCooldown}</span>
+                        </InfoRow>
+                        <InfoRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
+                          <span>Deviation trigger</span>
+                          <span>{VAULT.params.deviationTrigger}</span>
+                        </InfoRow>
+                        <InfoRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
+                          <span>TWAP window</span>
+                          <span>{VAULT.params.twapWindow}</span>
+                        </InfoRow>
+                        <InfoRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
+                          <span>Max swap per rebalance</span>
+                          <span>{VAULT.params.maxSwap}</span>
+                        </InfoRow>
+                        <InfoRow $border={borderColorBox} $muted={fontColor3} $fc={fontColor1}>
+                          <span>Internal slippage cap</span>
+                          <span>{VAULT.params.slippageBps}</span>
+                        </InfoRow>
+                      </>
+                    )}
+                  </HalfInfo>
+                </DetailsCol>
+              </DetailsGrid>
             </FirstPartSection>
           )}
 
