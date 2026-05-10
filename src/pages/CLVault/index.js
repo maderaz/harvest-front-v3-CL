@@ -59,13 +59,10 @@ import TickCross from '../../assets/images/logos/tick-cross.svg'
  *   $border, $borderbottom, $borderradius,
  *   $display, $items, $self, $align, $justifycontent, $width
  *
- * Deviations from spec (intentional UX choices):
- *   - Deposit form has a Quick / Pro mode toggle. Spec says "no mode picker"
- *     and just two fields with auto-routing (== this Pro mode). Quick mode is
- *     a UX nicety: one amount field + token selector, always routed via
- *     CLWrapper(selectedToken). Pro mode is the spec-exact behavior with two
- *     fields and silent routing (CLWrapper for single-asset, CLVault.deposit
- *     for both).
+ * Deposit form: spec-exact dual-input — two amount fields, both available
+ * at all times, no mode picker. Smart routing decides the contract entry
+ * silently based on which fields are filled (CLWrapper for single-asset,
+ * CLVault.deposit for both).
  *
  * Tab content shape (matching classic page):
  *   activeMainTag === 0 (Manage):  InternalSection > full-width
@@ -285,9 +282,6 @@ const CLVault = () => {
 
   const [activeMainTag, setActiveMainTag] = useState(0)
   const [activeDepoTab, setActiveDepoTab] = useState(0)
-  const [depMode, setDepMode] = useState('quick') // 'quick' (single-asset via CLWrapper) | 'pro' (dual-input, spec)
-  const [quickToken, setQuickToken] = useState('t0')
-  const [quickAmount, setQuickAmount] = useState('')
   const [paramsOpen, setParamsOpen] = useState(false)
   const [agreed, setAgreed] = useState(false)
   const [chartRange, setChartRange] = useState('LAST')
@@ -317,12 +311,6 @@ const CLVault = () => {
     return null
   }, [dep0, dep1])
 
-  const quickRoute = useMemo(() => {
-    if (!parseFloat(quickAmount)) return null
-    const sym = quickToken === 't0' ? VAULT.pair.token0 : VAULT.pair.token1
-    return { label: `Routed via CLWrapper(${sym}): single asset`, kind: quickToken, sym }
-  }, [quickAmount, quickToken])
-
   const wRoute = useMemo(() => {
     if (output === 'both')
       return `Routed via CLVault.withdraw: receive ${VAULT.pair.token0} + ${VAULT.pair.token1}`
@@ -343,8 +331,7 @@ const CLVault = () => {
     setDep1((max * r1).toFixed(4))
   }
 
-  const supplyDisabled =
-    (depMode === 'quick' ? !quickRoute : !depRoute) || !agreed
+  const supplyDisabled = !depRoute || !agreed
   const withdrawDisabled = !parseFloat(shares)
 
   const today = new Date().toLocaleDateString('en-US', {
@@ -791,30 +778,6 @@ const CLVault = () => {
 
                       {activeDepoTab === 0 ? (
                         <>
-                          {/* Quick / Pro mode toggle (deviation from spec — spec says no mode picker; kept as UX nicety) */}
-                          <OutputGroup>
-                            <OutputOpt
-                              $active={depMode === 'quick'}
-                              $bg={bgColorChart}
-                              $border={borderColorBox}
-                              $fc={fontColor1}
-                              onClick={() => setDepMode('quick')}
-                              type="button"
-                            >
-                              Quick (single asset)
-                            </OutputOpt>
-                            <OutputOpt
-                              $active={depMode === 'pro'}
-                              $bg={bgColorChart}
-                              $border={borderColorBox}
-                              $fc={fontColor1}
-                              onClick={() => setDepMode('pro')}
-                              type="button"
-                            >
-                              Pro (both assets)
-                            </OutputOpt>
-                          </OutputGroup>
-
                           <NewLabel
                             $size="13px"
                             $weight="500"
@@ -822,108 +785,11 @@ const CLVault = () => {
                             $fontcolor={fontColor3}
                             $marginbottom="14px"
                           >
-                            {depMode === 'quick'
-                              ? 'Single-asset deposit. The token is auto-swapped on-chain to match the position’s ratio.'
-                              : 'Smart routing. Fill both tokens at the optimal ratio for a no-swap deposit, or fill one for the single-asset path.'}
+                            Two amount fields, both available at all times. Fill both at the
+                            optimal ratio for a no-swap deposit, or fill one for the single-asset
+                            path. Smart routing picks the optimal contract entry point.
                           </NewLabel>
 
-                          {depMode === 'quick' ? (
-                            <>
-                              <FieldLabel $fc={fontColor1} $muted={fontColor3}>
-                                <span>Pay with</span>
-                              </FieldLabel>
-                              <OutputGroup>
-                                <OutputOpt
-                                  $active={quickToken === 't0'}
-                                  $bg={bgColorChart}
-                                  $border={borderColorBox}
-                                  $fc={fontColor1}
-                                  onClick={() => setQuickToken('t0')}
-                                  type="button"
-                                >
-                                  {VAULT.pair.token0}
-                                </OutputOpt>
-                                <OutputOpt
-                                  $active={quickToken === 't1'}
-                                  $bg={bgColorChart}
-                                  $border={borderColorBox}
-                                  $fc={fontColor1}
-                                  onClick={() => setQuickToken('t1')}
-                                  type="button"
-                                >
-                                  {VAULT.pair.token1}
-                                </OutputOpt>
-                              </OutputGroup>
-
-                              <FieldLabel $fc={fontColor1} $muted={fontColor3}>
-                                <span>
-                                  Amount{' '}
-                                  {quickToken === 't0' ? VAULT.pair.token0 : VAULT.pair.token1}
-                                </span>
-                                <span
-                                  className="bal"
-                                  onClick={() =>
-                                    setQuickAmount(
-                                      quickToken === 't0'
-                                        ? VAULT.walletBalances.token0
-                                        : VAULT.walletBalances.token1,
-                                    )
-                                  }
-                                  title="Click to use full balance"
-                                >
-                                  Balance:{' '}
-                                  {quickToken === 't0'
-                                    ? VAULT.walletBalances.token0
-                                    : VAULT.walletBalances.token1}
-                                </span>
-                              </FieldLabel>
-                              <FieldBox $bg={bgColorChart} $border={borderColorBox}>
-                                <Input
-                                  $fc={fontColor1}
-                                  $muted={fontColor8}
-                                  placeholder="0.0"
-                                  inputMode="decimal"
-                                  value={quickAmount}
-                                  onChange={e => setQuickAmount(e.target.value)}
-                                />
-                                <TokenPill
-                                  $bg={bgColorBox}
-                                  $border={borderColorBox}
-                                  $fc={fontColor1}
-                                >
-                                  {quickToken === 't0' ? VAULT.pair.token0 : VAULT.pair.token1}
-                                </TokenPill>
-                              </FieldBox>
-
-                              {quickRoute && (
-                                <>
-                                  <RouteNote $muted={fontColor3}>{quickRoute.label}</RouteNote>
-                                  <Preview
-                                    $bg={bgColorChart}
-                                    $border={borderColorBox}
-                                    $fc={fontColor1}
-                                    $muted={fontColor3}
-                                  >
-                                    <div>
-                                      <span className="muted">Expected shares</span>
-                                      <span className="val">
-                                        ~ 0.0000 fcl-{VAULT.pair.token0}-{VAULT.pair.token1}
-                                      </span>
-                                    </div>
-                                    <div>
-                                      <span className="muted">Value (in {quickRoute.sym})</span>
-                                      <span className="val">~ 0.0000</span>
-                                    </div>
-                                    <div>
-                                      <span className="muted">Internal swap cost</span>
-                                      <span className="val">~ 22 bps</span>
-                                    </div>
-                                  </Preview>
-                                </>
-                              )}
-                            </>
-                          ) : (
-                            <>
                           <FieldLabel $fc={fontColor1} $muted={fontColor3}>
                             <span>Amount {VAULT.pair.token0}</span>
                             <span
@@ -1026,8 +892,6 @@ const CLVault = () => {
                               </Preview>
                             </>
                           )}
-                            </>
-                          )}
 
                           <Slippage
                             $muted={fontColor3}
@@ -1123,7 +987,7 @@ const CLVault = () => {
                           </label>
 
                           <Cta type="button" disabled={supplyDisabled}>
-                            {!(depMode === 'quick' ? quickRoute : depRoute)
+                            {!depRoute
                               ? 'Enter an amount'
                               : !agreed
                                 ? 'Agree to terms above'
