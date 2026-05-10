@@ -47,6 +47,7 @@ export const ROUTES = {
   WIKI: 'https://docs.harvest.finance/',
   LEADERBOARD: '/leaderboard',
   MIGRATE: '/migrate',
+  CLVAULT: '/cl-vault',
 }
 
 export const KEY_CODES = {
