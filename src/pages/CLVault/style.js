@@ -503,6 +503,300 @@ export const ChartPlaceholder = styled.div`
   color: ${p => p.$muted};
 `
 
+export const ChartHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+  gap: 16px;
+`
+
+export const ChartHeaderCol = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+`
+
+export const ChartLabel = styled.span`
+  font-size: 14px;
+  font-weight: 700;
+  color: ${p => p.$color};
+`
+
+export const ChartMeta = styled.span`
+  font-size: 12px;
+  color: ${p => p.$muted};
+  font-weight: 500;
+
+  strong {
+    color: ${p => p.$fc};
+    font-weight: 700;
+    margin-left: 4px;
+  }
+`
+
+export const ChartFrame = styled.div`
+  position: relative;
+  width: 100%;
+  height: 220px;
+  border-radius: 10px;
+  background: ${p => p.$bg};
+  overflow: hidden;
+  padding: 12px 6px;
+  box-sizing: border-box;
+`
+
+export const AxisYLeft = styled.div`
+  position: absolute;
+  left: 6px;
+  top: 8px;
+  bottom: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 10.5px;
+  color: ${p => p.$muted};
+  font-weight: 500;
+  pointer-events: none;
+`
+
+export const AxisYRight = styled(AxisYLeft)`
+  left: auto;
+  right: 6px;
+  align-items: flex-end;
+`
+
+export const AxisX = styled.div`
+  position: absolute;
+  left: 56px;
+  right: 56px;
+  bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 10.5px;
+  color: ${p => p.$muted};
+  font-weight: 500;
+`
+
+export const ChartCenterText = styled.div`
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: ${p => p.$muted};
+  pointer-events: none;
+`
+
+export const RangeBtnRow = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+  margin-top: 10px;
+`
+
+export const RangeBtn = styled.button`
+  background: none;
+  border: none;
+  padding: 4px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: ${p => (p.$active ? '#5dcf46' : p.$muted)};
+  cursor: pointer;
+
+  &:hover {
+    color: ${p => p.$fc};
+  }
+`
+
+export const TopBoxRow = styled.div`
+  display: flex;
+  width: 100%;
+  gap: 16px;
+  margin-bottom: 25px;
+
+  @media (max-width: 992px) {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+`
+
+export const TopBox = styled.div`
+  flex: 1;
+  background: ${p => p.$bg};
+  border: 2px solid ${p => p.$border};
+  border-radius: 12px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+
+  @media (max-width: 992px) {
+    flex-basis: calc(50% - 6px);
+  }
+`
+
+export const TopBoxTitle = styled.div`
+  font-size: 13px;
+  font-weight: 500;
+  color: ${p => p.$muted};
+`
+
+export const TopBoxValue = styled.div`
+  font-size: 22px;
+  font-weight: 700;
+  color: ${p => p.$fc};
+  letter-spacing: -0.4px;
+`
+
+export const DetailsGrid = styled.div`
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 20px;
+
+  @media (max-width: 1180px) {
+    grid-template-columns: 1fr;
+  }
+`
+
+export const DetailsCol = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+`
+
+export const SectionTitle = styled.div`
+  font-size: 14px;
+  font-weight: 700;
+  color: ${p => p.$fc};
+  padding: 12px 18px;
+  border-bottom: 1px solid ${p => p.$border};
+`
+
+export const InfoRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 18px;
+  font-size: 13px;
+  border-bottom: 1px solid ${p => p.$border};
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  > span:first-child {
+    color: ${p => p.$muted};
+    font-weight: 500;
+  }
+  > span:last-child {
+    color: ${p => p.$fc};
+    font-weight: 600;
+  }
+`
+
+export const SourceText = styled.p`
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: ${p => p.$fc};
+  margin: 0 0 14px;
+
+  strong {
+    color: ${p => p.$fc};
+    font-weight: 700;
+    border-bottom: 1px dashed ${p => p.$muted};
+  }
+`
+
+export const AddressBtnRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+`
+
+export const AddressBtn = styled.button`
+  background: ${p => p.$bg};
+  border: 1px solid ${p => p.$border};
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: ${p => p.$fc};
+  cursor: pointer;
+
+  &:hover {
+    border-color: #5dcf46;
+    color: #5dcf46;
+  }
+`
+
+export const TipBox = styled.div`
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  background: ${p => p.$bg};
+  border: 1px solid ${p => p.$border};
+  border-radius: 10px;
+  margin: 14px 18px 18px;
+`
+
+export const TipBoxIcon = styled.div`
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #1da64a;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+`
+
+export const TipBoxText = styled.div`
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: ${p => p.$fc};
+
+  strong {
+    color: ${p => p.$accent};
+    font-weight: 700;
+    margin-bottom: 4px;
+    display: block;
+  }
+  a {
+    color: #1da64a;
+    font-weight: 600;
+    text-decoration: underline;
+  }
+`
+
+export const FormRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  margin-bottom: 8px;
+
+  > span:first-child {
+    color: ${p => p.$muted};
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  > span:last-child {
+    color: ${p => p.$fc};
+    font-weight: 700;
+  }
+`
+
 export const Slippage = styled.div`
   display: flex;
   align-items: center;
