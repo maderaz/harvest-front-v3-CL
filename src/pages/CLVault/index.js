@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useMediaQuery } from 'react-responsive'
 import { BiLeftArrowAlt } from 'react-icons/bi'
 import { PiQuestion } from 'react-icons/pi'
 import { Tooltip } from 'react-tooltip'
@@ -28,7 +29,9 @@ import TickCross from '../../assets/images/logos/tick-cross.svg'
  *   NetDetail, NetDetailItem, NetDetailTitle,
  *     NetDetailContent, NetDetailImg                              right of tabs
  *   MainSection (59%) + RestContent (39%)                         2-col split
- *   ManageBoxWrapper, BoxCover                                    flex wrappers
+ *   BoxCover                                                      Details top row
+ *   (ManagePanelsRow lives in CLVault/style.js — local replacement of
+ *    AdvancedFarm's ManageBoxWrapper, with mobile gap kept non-zero)
  *   FirstPartSection, RestInternal                                tab content
  *   HalfContent                                                   form box
  *
@@ -66,7 +69,7 @@ import TickCross from '../../assets/images/logos/tick-cross.svg'
  *
  * Tab content shape (matching classic page):
  *   activeMainTag === 0 (Manage):  InternalSection > full-width
- *                                  ManageBoxWrapper (3 stats panels) +
+ *                                  ManagePanelsRow (3 stats panels) +
  *                                  MainSection (USD/Underlying chart first,
  *                                  then Active Range + Composition) +
  *                                  RestContent (Supply/Revert form).
@@ -102,7 +105,6 @@ import {
   RestContent,
   HalfContent,
   MyBalance,
-  ManageBoxWrapper,
   BoxCover,
   ValueBox,
   BoxTitle,
@@ -158,6 +160,8 @@ import {
   AxisX,
   RangeBtnRow,
   RangeBtn,
+  ManagePanelsRow,
+  TopDescOverride,
 } from './style'
 
 const VAULT = {
@@ -277,6 +281,7 @@ const CLVault = () => {
   } = useThemeContext()
 
   const navigate = useNavigate()
+  const isMobile = useMediaQuery({ query: '(max-width: 992px)' })
 
   const [activeMainTag, setActiveMainTag] = useState(0)
   const [activeDepoTab, setActiveDepoTab] = useState(0)
@@ -427,7 +432,7 @@ const CLVault = () => {
      live API data; this is a static placeholder with the same chrome. */
   const balanceChart = (
     <HalfInfo
-      $padding="20px"
+      $padding={isMobile ? '12px' : '20px'}
       $marginbottom="20px"
       $backcolor={bgColorBox}
       $bordercolor={borderColorBox}
@@ -542,31 +547,33 @@ const CLVault = () => {
                   Ξ
                 </TokenCircle>
               </TopLogo>
-              <TopDesc
-                $weight={600}
-                $fontcolor2={fontColor2}
-                $size="25px"
-                $height="82px"
-                $marginbottom="10px"
-              >
-                {VAULT.pair.token0}/{VAULT.pair.token1}
-                <span
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    letterSpacing: 0.4,
-                    padding: '3px 8px',
-                    borderRadius: 4,
-                    background: bgColorBox,
-                    border: `1px solid ${borderColorBox}`,
-                    color: fontColor3,
-                    marginLeft: 10,
-                    verticalAlign: 'middle',
-                  }}
+              <TopDescOverride>
+                <TopDesc
+                  $weight={600}
+                  $fontcolor2={fontColor2}
+                  $size="25px"
+                  $height="82px"
+                  $marginbottom="10px"
                 >
-                  CL
-                </span>
-              </TopDesc>
+                  {VAULT.pair.token0}/{VAULT.pair.token1}
+                  <span
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      letterSpacing: 0.4,
+                      padding: '3px 8px',
+                      borderRadius: 4,
+                      background: bgColorBox,
+                      border: `1px solid ${borderColorBox}`,
+                      color: fontColor3,
+                      marginLeft: 10,
+                      verticalAlign: 'middle',
+                    }}
+                  >
+                    CL
+                  </span>
+                </TopDesc>
+              </TopDescOverride>
             </FlexDiv>
 
             <GuideSection>
@@ -620,7 +627,7 @@ const CLVault = () => {
           {activeMainTag === 0 && (
             <InternalSection>
               {/* Top row: 3 stats panels — full width, sibling of MainSection */}
-              <ManageBoxWrapper style={{ marginBottom: 25, width: '100%' }}>
+              <ManagePanelsRow>
                 {managePanel({
                   title: 'Lifetime Yield',
                   tooltipId: 'cl-tooltip-lifetime',
@@ -650,7 +657,7 @@ const CLVault = () => {
                     ['Monthly', '$0.00'],
                   ],
                 })}
-              </ManageBoxWrapper>
+              </ManagePanelsRow>
 
               <MainSection $height="100%">
                 {/* Performance chart — placed first per design (USD/Underlying balance) */}
@@ -1278,7 +1285,7 @@ const CLVault = () => {
               <MainSection $height="fit-content">
                 {/* Share Price chart placeholder */}
                   <HalfInfo
-                    $padding="20px"
+                    $padding={isMobile ? '12px' : '20px'}
                     $marginbottom="25px"
                     $backcolor={bgColorBox}
                     $bordercolor={borderColorBox}
