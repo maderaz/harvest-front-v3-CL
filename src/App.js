@@ -23,6 +23,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import { useThemeContext } from './providers/useThemeContext'
 import LeaderBoard from './pages/LeaderBoard'
 import Migrate from './pages/Migrate'
+import CLVault from './pages/CLVault'
 
 const NewLoginModal = () => {
   const newLogin = localStorage.getItem('newLogin')
@@ -92,6 +93,7 @@ const App = () => (
           <Route path={ROUTES.FAQ} element={<FAQ />} />
           <Route path={ROUTES.LEADERBOARD} element={<LeaderBoard />} />
           <Route path={ROUTES.MIGRATE} element={<Migrate />} />
+          <Route path={ROUTES.CLVAULT} element={<CLVault />} />
           <Route path={ROUTES.SETTINGS} element={<Settings />} />
           <Route path={ROUTES.ACTIVITY} element={<Activity />} />
         </Routes>
