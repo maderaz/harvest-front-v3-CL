@@ -490,6 +490,19 @@ export const Cta = styled.button`
   }
 `
 
+export const ChartPlaceholder = styled.div`
+  width: 100%;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: ${p => p.$bg};
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: ${p => p.$muted};
+`
+
 export const Slippage = styled.div`
   display: flex;
   align-items: center;
