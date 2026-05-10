@@ -670,21 +670,25 @@ const CLVault = () => {
                       $marginbottom="20px"
                     >
                       <FlexDiv
-                        $justifycontent="space-between"
                         $padding="10px 15px"
-                        style={{ borderBottom: `1px solid ${borderColorBox}`, alignItems: 'center' }}
+                        style={{
+                          borderBottom: `1px solid ${borderColorBox}`,
+                          flexDirection: 'column',
+                          alignItems: 'flex-start',
+                          gap: 4,
+                        }}
                       >
-                        <FlexDiv style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+                        <FlexDiv style={{ alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                           <NewLabel $size="14px" $weight="600" $height="20px" $fontcolor={fontColor4}>
                             Active Range
                           </NewLabel>
-                          <NewLabel $size="12px" $weight="500" $height="18px" $fontcolor={fontColor3}>
-                            Position is concentrated within these price bounds.
-                          </NewLabel>
+                          <Badge $ok={VAULT.inRange}>
+                            {VAULT.inRange ? 'in range' : 'out of range'}
+                          </Badge>
                         </FlexDiv>
-                        <Badge $ok={VAULT.inRange}>
-                          {VAULT.inRange ? 'in range' : 'out of range'}
-                        </Badge>
+                        <NewLabel $size="12px" $weight="500" $height="18px" $fontcolor={fontColor3}>
+                          Position is concentrated within these price bounds.
+                        </NewLabel>
                       </FlexDiv>
                       <div style={{ paddingTop: 18 }} />
                       <RangeBarOuter $bg={bgColorChart}>
@@ -721,7 +725,7 @@ const CLVault = () => {
                       </CompositionRow>
                       <CompositionBar $border={borderColorBox}>
                         <CompositionFill $pct={VAULT.composition.token0Pct} $color="#7d68d3" />
-                        <CompositionFill $pct={VAULT.composition.token1Pct} $color="#4f7ce0" />
+                        <CompositionFill $pct={VAULT.composition.token1Pct} $color="#1e5fd3" />
                       </CompositionBar>
                       {kvRow(`Vault holdings (${VAULT.pair.token0})`, VAULT.composition.token0Amount, 'h0')}
                       {kvRow(`Vault holdings (${VAULT.pair.token1})`, VAULT.composition.token1Amount, 'h1')}
@@ -1395,7 +1399,11 @@ const CLVault = () => {
                         rewards auto-compound back into the same range.
                       </p>
                     </DescInfo>
-                    <FlexDiv className="address" $padding="0 15px 20px">
+                    <FlexDiv
+                      className="address"
+                      $padding="0 15px 20px"
+                      style={{ flexWrap: 'wrap', gap: 8 }}
+                    >
                       {['Vault Address', 'Strategy Address', 'Pool Address', 'Add Liquidity'].map(
                         label => (
                           <InfoLabel
@@ -1407,6 +1415,7 @@ const CLVault = () => {
                             $hovercolor={hoverColor || hoverColorNew}
                             $bordercolor={borderColorBox}
                             $padding="9px 17px"
+                            style={{ flex: '1 1 140px', minWidth: 0, justifyContent: 'center' }}
                           >
                             <NewLabel
                               $size="12px"

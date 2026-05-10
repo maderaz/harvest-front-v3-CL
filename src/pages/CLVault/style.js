@@ -459,12 +459,16 @@ export const ManagePanelsRow = styled.div`
 
 /* Headline tweaks for the CL-page TopDesc. The classic TopDesc has
    line-height 82px which makes sense for desktop where the icons are 60px
-   tall, but on mobile that produces a giant blank line. Override here. */
+   tall, but on mobile that produces a giant blank line. Override here.
+   Also center-align on mobile so the title sits under the centered icons. */
 export const TopDescOverride = styled.div`
   & > * {
     @media screen and (max-width: 992px) {
       font-size: 18px;
       line-height: 26px;
+      text-align: center;
+      width: 100%;
+      margin: 5px auto !important;
     }
   }
 `
