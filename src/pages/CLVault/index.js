@@ -322,6 +322,12 @@ const CLVault = () => {
   // without any other change.
   const SHOW_TWO_SIDED_TOGGLE = false
 
+  // Range parameters collapsible (Target width, Deviation trigger, TWAP window,
+  // etc.) is currently hidden. Per dev, the Active Range card covers all the
+  // strategy info a user needs to see. Flip to true to bring the collapsible
+  // back without any other change.
+  const SHOW_RANGE_PARAMS = false
+
   const [activeMainTag, setActiveMainTag] = useState(0)
   const [activeDepoTab, setActiveDepoTab] = useState(0)
   const [depMode, setDepMode] = useState('quick') // 'quick' (single-asset via CLWrapper) | 'pro' (dual-input, spec)
@@ -1563,8 +1569,6 @@ const CLVault = () => {
                     around the new spot. Rebalances are TWAP-gated, so a single block of price
                     manipulation cannot trick the contract into swapping at a bad price.
                   </NewLabel>
-                  {kvRow('Fee tier', VAULT.feeTier, 'ft')}
-                  {kvRow('Rebalance cooldown', VAULT.params.rebalanceCooldown, 'rc')}
                   <div style={{ height: 8 }} />
                 </HalfInfo>
 
@@ -1688,37 +1692,41 @@ const CLVault = () => {
                     {kvRow('Typical interaction (single asset)', VAULT.costs.singleAsset, 'ts')}
                   </LastHarvestInfo>
 
-                  {/* Range parameters — CL-specific collapsible card */}
-                  <LastHarvestInfo $backcolor={bgColorBox} $bordercolor={borderColorBox}>
-                    <FlexDiv
-                      onClick={() => setParamsOpen(o => !o)}
-                      $justifycontent="space-between"
-                      $padding="10px 15px"
-                      style={{
-                        borderBottom: paramsOpen ? `1px solid ${borderColorBox}` : 'none',
-                        cursor: 'pointer',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <NewLabel $size="14px" $weight="600" $height="24px" $fontcolor={fontColor4}>
-                        Range parameters
-                      </NewLabel>
-                      <Caret $muted={fontColor3} $open={paramsOpen}>
-                        ▼
-                      </Caret>
-                    </FlexDiv>
-                    {paramsOpen && (
-                      <>
-                        {kvRow('Target width', VAULT.params.targetWidth, 'tw')}
-                        {kvRow('Current width', VAULT.params.currentWidth, 'cw')}
-                        {kvRow('Rebalance cooldown', VAULT.params.rebalanceCooldown, 'rc2')}
-                        {kvRow('Deviation trigger', VAULT.params.deviationTrigger, 'dt')}
-                        {kvRow('TWAP window', VAULT.params.twapWindow, 'tw2')}
-                        {kvRow('Max swap per rebalance', VAULT.params.maxSwap, 'ms')}
-                        {kvRow('Internal slippage cap', VAULT.params.slippageBps, 'is')}
-                      </>
-                    )}
-                  </LastHarvestInfo>
+                  {/* Range parameters — CL-specific collapsible card, hidden via
+                      SHOW_RANGE_PARAMS. Dev says Active Range covers the relevant
+                      strategy info; this card is kept here in case it's needed back. */}
+                  {SHOW_RANGE_PARAMS && (
+                    <LastHarvestInfo $backcolor={bgColorBox} $bordercolor={borderColorBox}>
+                      <FlexDiv
+                        onClick={() => setParamsOpen(o => !o)}
+                        $justifycontent="space-between"
+                        $padding="10px 15px"
+                        style={{
+                          borderBottom: paramsOpen ? `1px solid ${borderColorBox}` : 'none',
+                          cursor: 'pointer',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <NewLabel $size="14px" $weight="600" $height="24px" $fontcolor={fontColor4}>
+                          Range parameters
+                        </NewLabel>
+                        <Caret $muted={fontColor3} $open={paramsOpen}>
+                          ▼
+                        </Caret>
+                      </FlexDiv>
+                      {paramsOpen && (
+                        <>
+                          {kvRow('Target width', VAULT.params.targetWidth, 'tw')}
+                          {kvRow('Current width', VAULT.params.currentWidth, 'cw')}
+                          {kvRow('Rebalance cooldown', VAULT.params.rebalanceCooldown, 'rc2')}
+                          {kvRow('Deviation trigger', VAULT.params.deviationTrigger, 'dt')}
+                          {kvRow('TWAP window', VAULT.params.twapWindow, 'tw2')}
+                          {kvRow('Max swap per rebalance', VAULT.params.maxSwap, 'ms')}
+                          {kvRow('Internal slippage cap', VAULT.params.slippageBps, 'is')}
+                        </>
+                      )}
+                    </LastHarvestInfo>
+                  )}
                 </RestInternal>
               </RestContent>
             </InternalSection>
