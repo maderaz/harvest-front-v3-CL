@@ -171,7 +171,7 @@ const VAULT = {
   tvl: '$411.37',
   lastRebalance: '6 hours ago',
   // Deposit cap (in the debt/entry asset, WETH). filled = already supplied.
-  cap: { total: 500, filled: 335, unit: 'WETH' },
+  cap: { total: 500, filled: 335.2143728, unit: 'WETH' },
   // Live position state.
   position: {
     collateralAmount: '742.18 cbETH',
@@ -292,8 +292,8 @@ const Question = ({ id, content, dark }) => (
       textColor={dark ? 'black' : 'white'}
       opacity={1}
       style={{
-        maxWidth: 240,
-        padding: '9px 12px',
+        maxWidth: 340,
+        padding: '9px 13px',
         borderRadius: 8,
         fontSize: 12,
         fontWeight: 500,
@@ -1077,7 +1077,7 @@ const LoopingVault = () => {
                 <Question
                   id="loop-tooltip-cap-badge"
                   dark={darkMode}
-                  content={`Deposit cap utilisation: ${VAULT.cap.filled} of ${VAULT.cap.total} ${VAULT.cap.unit} supplied. New entries are blocked once the cap is full.`}
+                  content={`Deposit cap utilisation: ${VAULT.cap.filled.toFixed(2)} of ${VAULT.cap.total} ${VAULT.cap.unit} supplied. New entries are blocked once the cap is full.`}
                 />
               </GuidePart>
             </GuideSection>
@@ -1265,10 +1265,18 @@ const LoopingVault = () => {
 
                           {/* Vault cap — the vault only accepts up to VAULT.cap.total of the
                               entry asset; capRemaining is what's still open. */}
-                          <div style={{ marginBottom: 14 }}>
+                          <div
+                            style={{
+                              marginTop: 6,
+                              marginBottom: 18,
+                              padding: '11px 12px',
+                              border: `1px solid ${borderColorBox}`,
+                              borderRadius: 10,
+                            }}
+                          >
                             <FlexDiv
                               $justifycontent="space-between"
-                              style={{ alignItems: 'center', marginBottom: 5 }}
+                              style={{ alignItems: 'center', marginBottom: 6 }}
                             >
                               <NewLabel
                                 $size="12px"
@@ -1281,7 +1289,11 @@ const LoopingVault = () => {
                                 {labelTip(
                                   'Vault cap',
                                   'tip-vault-cap',
-                                  `This vault accepts up to ${VAULT.cap.total} ${VAULT.cap.unit}. Entries are blocked once the cap is reached; it may be raised over time.`,
+                                  `This vault accepts up to ${VAULT.cap.total} ${VAULT.cap.unit}. Supplied: ${VAULT.cap.filled.toFixed(
+                                    6,
+                                  )} ${VAULT.cap.unit} · room left: ${capRemaining.toFixed(6)} ${
+                                    VAULT.cap.unit
+                                  }. Entries are blocked once the cap is reached; it may be raised over time.`,
                                 )}
                               </NewLabel>
                               <NewLabel
@@ -1290,7 +1302,7 @@ const LoopingVault = () => {
                                 $height="16px"
                                 $fontcolor={fontColor1}
                               >
-                                {VAULT.cap.filled} / {VAULT.cap.total} {VAULT.cap.unit}
+                                {VAULT.cap.filled.toFixed(2)} / {VAULT.cap.total} {VAULT.cap.unit}
                               </NewLabel>
                             </FlexDiv>
                             <div
@@ -1312,19 +1324,20 @@ const LoopingVault = () => {
                                 }}
                               />
                             </div>
-                            <NewLabel
-                              $size="11px"
-                              $weight="500"
-                              $height="16px"
-                              $fontcolor={overCap ? '#d6342f' : fontColor3}
-                              style={{ marginTop: 5 }}
-                            >
-                              {overCap
-                                ? `Amount exceeds remaining capacity. Only ${capRemaining.toFixed(
-                                    2,
-                                  )} ${VAULT.cap.unit} can still be supplied.`
-                                : `${capRemaining.toFixed(2)} ${VAULT.cap.unit} of room left.`}
-                            </NewLabel>
+                            {/* Room-left figure lives in the (?) tooltip; only surface an
+                                inline note when the entry exceeds remaining capacity. */}
+                            {overCap && (
+                              <NewLabel
+                                $size="11px"
+                                $weight="500"
+                                $height="16px"
+                                $fontcolor="#d6342f"
+                                style={{ marginTop: 6 }}
+                              >
+                                Amount exceeds remaining capacity. Only {capRemaining.toFixed(2)}{' '}
+                                {VAULT.cap.unit} can still be supplied.
+                              </NewLabel>
+                            )}
                           </div>
                         </>
                       ) : (
